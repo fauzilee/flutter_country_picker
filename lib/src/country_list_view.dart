@@ -61,9 +61,9 @@ class CountryListView extends StatefulWidget {
     this.showSearch = true,
     this.customFlagBuilder,
   })  : assert(
-  exclude == null || countryFilter == null,
-  'Cannot provide both exclude and countryFilter',
-  ),
+          exclude == null || countryFilter == null,
+          'Cannot provide both exclude and countryFilter',
+        ),
         super(key: key);
 
   @override
@@ -101,13 +101,13 @@ class _CountryListViewState extends State<CountryListView> {
 
     if (widget.exclude != null) {
       _countryList.removeWhere(
-            (element) => widget.exclude!.contains(element.countryCode),
+        (element) => widget.exclude!.contains(element.countryCode),
       );
     }
 
     if (widget.countryFilter != null) {
       _countryList.removeWhere(
-            (element) => !widget.countryFilter!.contains(element.countryCode),
+        (element) => !widget.countryFilter!.contains(element.countryCode),
       );
     }
 
@@ -129,6 +129,30 @@ class _CountryListViewState extends State<CountryListView> {
     return Column(
       children: <Widget>[
         const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Add this line
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.close),
+            ),
+            const Text(
+              'Select country code',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.close,
+                color: Colors.transparent,
+              ),
+            ),
+          ],
+        ),
         if (widget.showSearch)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -136,7 +160,7 @@ class _CountryListViewState extends State<CountryListView> {
               autofocus: _searchAutofocus,
               controller: _searchController,
               style:
-              widget.countryListTheme?.searchTextStyle ?? _defaultTextStyle,
+                  widget.countryListTheme?.searchTextStyle ?? _defaultTextStyle,
               decoration: widget.countryListTheme?.inputDecoration ??
                   InputDecoration(
                     labelText: searchLabel,
@@ -177,13 +201,9 @@ class _CountryListViewState extends State<CountryListView> {
     final TextStyle _textStyle =
         widget.countryListTheme?.textStyle ?? _defaultTextStyle;
 
-    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
-
     return Material(
-      // Add Material Widget with transparent color
-      // so the ripple effect of InkWell will show on tap
       color: Colors.transparent,
-      child: InkWell(
+      child: ListTile(
         onTap: () {
           country.nameLocalized = CountryLocalizations.of(context)
               ?.countryName(countryCode: country.countryCode)
@@ -191,42 +211,20 @@ class _CountryListViewState extends State<CountryListView> {
           widget.onSelect(country);
           Navigator.pop(context);
         },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: Row(
-            children: <Widget>[
-              Row(
-                children: [
-                  const SizedBox(width: 20),
-                  if (widget.customFlagBuilder == null)
-                    _flagWidget(country)
-                  else
-                    widget.customFlagBuilder!(country),
-                  if (widget.showPhoneCode && !country.iswWorldWide) ...[
-                    const SizedBox(width: 15),
-                    SizedBox(
-                      width: 45,
-                      child: Text(
-                        '${isRtl ? '' : '+'}${country.phoneCode}${isRtl ? '+' : ''}',
-                        style: _textStyle,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                  ] else
-                    const SizedBox(width: 15),
-                ],
-              ),
-              Expanded(
-                child: Text(
-                  CountryLocalizations.of(context)
-                      ?.countryName(countryCode: country.countryCode)
-                      ?.replaceAll(RegExp(r"\s+"), " ") ??
-                      country.name,
-                  style: _textStyle,
-                ),
-              ),
-            ],
-          ),
+        leading: _flagWidget(country),
+        title: Text(
+          CountryLocalizations.of(context)
+                  ?.countryName(countryCode: country.countryCode)
+                  ?.replaceAll(RegExp(r"\s+"), " ") ??
+              country.name,
+          style: _textStyle,
+        ),
+        trailing: Text(
+          CountryLocalizations.of(context)
+                  ?.countryName(countryCode: country.countryCode)
+                  ?.replaceAll(RegExp(r"\s+"), " ") ??
+              '+${country.phoneCode}',
+          style: _textStyle,
         ),
       ),
     );
@@ -242,19 +240,19 @@ class _CountryListViewState extends State<CountryListView> {
   }
 
   Widget _emojiText(Country country) => Text(
-    country.iswWorldWide
-        ? '\uD83C\uDF0D'
-        : Utils.countryCodeToEmoji(country.countryCode),
-    style: TextStyle(
-      fontSize: widget.countryListTheme?.flagSize ?? 25,
-      fontFamilyFallback: widget.countryListTheme?.emojiFontFamilyFallback,
-    ),
-  );
+        country.iswWorldWide
+            ? '\uD83C\uDF0D'
+            : Utils.countryCodeToEmoji(country.countryCode),
+        style: TextStyle(
+          fontSize: widget.countryListTheme?.flagSize ?? 25,
+          fontFamilyFallback: widget.countryListTheme?.emojiFontFamilyFallback,
+        ),
+      );
 
   void _filterSearchResults(String query) {
     List<Country> _searchResult = <Country>[];
     final CountryLocalizations? localizations =
-    CountryLocalizations.of(context);
+        CountryLocalizations.of(context);
 
     if (query.isEmpty) {
       _searchResult.addAll(_countryList);
@@ -267,5 +265,6 @@ class _CountryListViewState extends State<CountryListView> {
     setState(() => _filteredList = _searchResult);
   }
 
-  TextStyle get _defaultTextStyle => const TextStyle(fontSize: 16);
+  TextStyle get _defaultTextStyle =>
+      const TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
 }
