@@ -8,6 +8,7 @@ import 'country_localizations.dart';
 ///information needed from the [country_picker]
 class Country {
   static Country worldWide = Country(
+    id: 0,
     phoneCode: '',
     countryCode: 'WW',
     e164Sc: -1,
@@ -19,6 +20,8 @@ class Country {
     displayNameNoCountryCode: 'World Wide',
     e164Key: '',
   );
+
+  final int id;
 
   ///The country phone code
   final String phoneCode;
@@ -61,6 +64,7 @@ class Country {
   }
 
   Country({
+    required this.id,
     required this.phoneCode,
     required this.countryCode,
     required this.e164Sc,
@@ -76,7 +80,8 @@ class Country {
   });
 
   Country.from({required Map<String, dynamic> json})
-      : phoneCode = json['e164_cc'],
+      : id = json['id'],
+        phoneCode = json['e164_cc'],
         countryCode = json['iso2_cc'],
         e164Sc = json['e164_sc'],
         geographic = json['geographic'],
@@ -106,6 +111,7 @@ class Country {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
     data['e164_cc'] = phoneCode;
     data['iso2_cc'] = countryCode;
     data['e164_sc'] = e164Sc;
